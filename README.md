@@ -230,7 +230,7 @@ npm start
 
 ```json
 {
-  "geminiApiKey": "AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q",
+  "geminiApiKey": "YOUR API KEY",
   "projectPath": "/home/user/projects/my-application",
   "settings": {
     "serverPort": 3000,
@@ -496,7 +496,7 @@ npm start
 
 ```json
 {
-  "geminiApiKey": "AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q",
+  "geminiApiKey": "SUA CHAVE API",
   "projectPath": "/home/usuario/projetos/minha-aplicacao",
   "settings": {
     "serverPort": 3000,
