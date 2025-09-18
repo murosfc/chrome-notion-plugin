@@ -214,6 +214,11 @@ class LocalServer {
 
   start() {
     const server = this.app.listen(this.port, 'localhost', () => {
+      console.log('🚀 Chrome Notion Plugin Server is running!');
+      console.log(`📡 Server: http://localhost:${this.port}`);
+      console.log('🔗 Ready to receive requests from Chrome Extension');
+      console.log('📝 Press Ctrl+C to stop the server');
+      console.log(''); // Empty line for better readability
     });
 
     // Graceful shutdown

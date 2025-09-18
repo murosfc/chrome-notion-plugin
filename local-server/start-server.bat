@@ -66,7 +66,9 @@ if %errorlevel% equ 0 (
 echo.
 
 REM Start the server
-echo Starting server with Node.js...
+echo ================================
+echo Starting Chrome Notion Plugin Server...
+echo ================================
 echo.
 node server.js
 
