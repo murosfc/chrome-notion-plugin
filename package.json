@@ -1,0 +1,59 @@
+{
+  "name": "chrome-notion-git-plugin",
+  "version": "1.0.0",
+  "description": "Plugin para Chrome que cria branches Git automaticamente baseado em cards do Notion usando IA Gemini",
+  "main": "install.js",
+  "scripts": {
+    "install-plugin": "node install.js",
+    "start-server": "cd local-server && npm start",
+    "dev-server": "cd local-server && npm run dev",
+    "test-git": "cd local-server && npm test",
+    "test-gemini": "node test-gemini-api.js",
+    "test-notion": "node test-notion-detection.js",
+    "test-all": "npm run test-git && npm run test-gemini && npm run test-notion",
+    "setup": "npm run install-plugin && npm run start-server",
+    "debug": "npm run test-all",
+    "build": "echo 'Projeto já compilado. Execute npm run setup para instalar.'",
+    "postinstall": "echo '🚀 Execute: npm run install-plugin para configurar o plugin'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "notion",
+    "git",
+    "automation",
+    "gemini-ai",
+    "branch-creation",
+    "productivity"
+  ],
+  "author": "Notion Git Plugin Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/chrome-notion-git-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seu-usuario/chrome-notion-git-plugin/issues"
+  },
+  "homepage": "https://github.com/seu-usuario/chrome-notion-git-plugin#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ],
+  "directories": {
+    "lib": "local-server",
+    "doc": "docs",
+    "example": "examples"
+  },
+  "files": [
+    "chrome-extension/",
+    "local-server/",
+    "config.json.example",
+    "install.js",
+    "README.md"
+  ]
+}

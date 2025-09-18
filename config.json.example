@@ -1,0 +1,31 @@
+{
+  "geminiApiKey": "COLE_SUA_CHAVE_API_GEMINI_AQUI",
+  "projectPath": "/caminho/para/seu/projeto",
+  "settings": {
+    "serverPort": 3000,
+    "branchPrefix": "auto",
+    "defaultBranchType": "feat",
+    "maxBranchNameLength": 60,
+    "generateBranchDescription": false
+  },
+  "advanced": {
+    "gitTimeout": 30000,
+    "apiTimeout": 10000,
+    "debugMode": false,
+    "autoCheckout": true,      // true = checkout automático (padrão) | false = apenas criar
+    "backupBranch": true
+  },
+  "examples": {
+    "geminiApiKey_help": "Obtenha sua chave em: https://makersuite.google.com/app/apikey",
+    "projectPath_examples": [
+      "Windows: C:\\projetos\\meu-projeto",
+      "Linux/Mac: /home/usuario/projetos/meu-projeto",
+      "Mac: /Users/usuario/projetos/meu-projeto"
+    ],
+    "branchPrefix_options": [
+      "auto - Deixa o Gemini decidir (feat/, fix/, etc.)",
+      "custom - Usa um prefixo personalizado",
+      "none - Sem prefixo"
+    ]
+  }
+}

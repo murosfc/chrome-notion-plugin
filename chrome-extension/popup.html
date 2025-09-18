@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notion Git Branch Creator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="popup-container">
+      <!-- Header -->
+      <div class="header">
+        <div class="logo">🚀 <span>Notion Git</span></div>
+        <div class="header-controls">
+          <div class="version">v1.0.0</div>
+        </div>
+      </div>
+
+      <!-- Status Card -->
+      <div class="status-card" id="statusCard">
+        <div class="status-indicator" id="statusIndicator">
+          <div class="pulse"></div>
+        </div>
+        <div class="status-text" id="statusText">Checking configuration...</div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- Configuration Section -->
+        <div class="section" id="configSection">
+          <h3>⚙️ Initial Configuration</h3>
+
+          <div class="input-group">
+            <label for="apiKeyInput">🔑 Gemini API Key:</label>
+            <div class="input-container">
+              <input
+                type="password"
+                id="apiKeyInput"
+                placeholder="Enter your Gemini API key"
+                placeholder="Paste your Gemini API key here..."
+                class="form-input"
+              />
+              <button
+                id="toggleApiKey"
+                class="toggle-btn"
+                title="Show/Hide"
+                title="Show/Hide"
+              >
+                👁️
+              </button>
+            </div>
+            <div class="help-text">
+              <a
+                href="https://makersuite.google.com/app/apikey"
+                target="_blank"
+              >
+                📋 Get API key
+              </a>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="projectPathInput">📁 Project Path:</label>
+            <div class="input-container">
+              <input
+                type="text"
+                id="projectPathInput"
+                placeholder="/path/to/your/project"
+                placeholder="C:\projects\my-project or /home/user/project"
+                class="form-input"
+              />
+              <button
+                id="selectFolder"
+                class="select-btn"
+                title="Select folder"
+                title="Select folder"
+              >
+                📂
+              </button>
+            </div>
+            <div class="help-text">Full path to your Git project folder</div>
+          </div>
+
+          <button id="saveConfigBtn" class="btn btn-primary">
+            💾 Save Configuration
+          </button>
+        </div>
+
+        <!-- Action Section -->
+        <div class="section" id="actionSection" style="display: none">
+          <h3>🎯 Actions</h3>
+
+          <div class="card-info" id="cardInfo">
+            <div class="card-title" id="cardTitle">No card detected</div>
+            <div class="card-url" id="cardUrl">
+              Open a Notion page with a card
+            </div>
+          </div>
+
+          <!-- Branch Suggestion Preview -->
+          <div
+            class="branch-suggestion"
+            id="branchSuggestion"
+            style="display: none"
+          >
+            <h4>🌿 Suggested Branch Name:</h4>
+            <div class="branch-preview">
+              <code id="branchPreview" class="branch-name-preview"></code>
+              <button
+                id="refreshSuggestionBtn"
+                class="btn-icon"
+                title="Generate new suggestion"
+                title="Generate new suggestion"
+              >
+                🔄
+              </button>
+            </div>
+            <div
+              class="branch-suggestion-loading"
+              id="branchSuggestionLoading"
+              style="display: none"
+            >
+              <span>Generating suggestion...</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="refreshCardBtn" class="btn btn-secondary">
+              🔄 Refresh Card
+            </button>
+            <button id="generateBranchBtn" class="btn btn-primary" disabled>
+              🚀 Create Branch
+            </button>
+          </div>
+
+          <div class="result-area" id="resultArea" style="display: none">
+            <div class="result-success" id="resultSuccess">
+              <div class="result-title">✅ Branch created successfully!</div>
+              <div class="branch-name" id="branchName"></div>
+              <div class="result-details" id="resultDetails"></div>
+            </div>
+            <div class="result-error" id="resultError">
+              <div class="error-title">❌ Error</div>
+              <div class="error-message" id="errorMessage"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connection Test -->
+        <div class="section">
+          <h3>🔍 Connection Status</h3>
+          <div class="connection-tests" id="connectionTests">
+            <div class="test-item">
+              <span class="test-label">Gemini API:</span>
+              <span class="test-status" id="geminiStatus">⏳ Testing...</span>
+            </div>
+            <div class="test-item">
+              <span class="test-label">Local Server:</span>
+              <span class="test-status" id="serverStatus">⏳ Testing...</span>
+            </div>
+          </div>
+          <button id="testConnectionBtn" class="btn btn-secondary btn-small">
+            🔧 Test Connections
+          </button>
+        </div>
+
+        <!-- Help Section -->
+        <div class="section help-section">
+          <details>
+            <summary>❓ How to use?</summary>
+            <div class="help-content">
+              <ol>
+                <li>Configure your Gemini API key and project path</li>
+                <li>Open a card in Notion</li>
+                <li>Click the plugin and then "Generate Branch"</li>
+                <li>
+                  The branch will be created automatically in your project!
+                </li>
+              </ol>
+              <p>
+                <strong>⚠️ Important:</strong>
+                <span>Start the local server first:</span>
+              </p>
+              <code>cd local-server && npm start</code>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div class="loading-overlay" id="loadingOverlay" style="display: none">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Processing...</div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
