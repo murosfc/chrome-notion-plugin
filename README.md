@@ -75,7 +75,13 @@ npm start
 
 ### 1. 🔑 Configure your Gemini API Key
 
-**Via Interface (Recommended):**
+**Option A: Via config.json file (Recommended):**
+
+1. Copy `config.json.example` to `config.json`
+2. Edit `config.json` and add your API key and project path
+3. The plugin will automatically detect and load these settings
+
+**Option B: Via Interface:**
 
 1. Install the Chrome extension
 2. Open the plugin
@@ -348,7 +354,13 @@ npm start
 
 ### 1. 🔑 Configure sua Chave API Gemini
 
-**Via Interface (Recomendado):**
+**Opção A: Via arquivo config.json (Recomendado):**
+
+1. Copie `config.json.example` para `config.json`
+2. Edite o `config.json` e adicione sua chave API e caminho do projeto
+3. O plugin detectará e carregará automaticamente essas configurações
+
+**Opção B: Via Interface:**
 
 1. Instale a extensão no Chrome
 2. Abra o plugin

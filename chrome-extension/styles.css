@@ -6,12 +6,12 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
-               'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Open Sans", "Helvetica Neue", sans-serif;
   font-size: 14px;
   line-height: 1.5;
   color: #374151;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
 }
 
@@ -19,7 +19,8 @@ body {
   width: 395px;
   min-height: 500px;
   background: #ffffff;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   position: relative;
 }
@@ -50,7 +51,6 @@ body {
   align-items: center;
   gap: 12px;
 }
-
 
 .version {
   font-size: 12px;
@@ -199,7 +199,23 @@ body {
   color: #9ca3af;
 }
 
-.toggle-btn, .select-btn {
+.form-input.config-loaded {
+  background-color: #f0f9ff !important;
+  border-color: #3b82f6 !important;
+}
+
+.form-input.config-loaded::placeholder {
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.form-input.missing-field {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
+}
+
+.toggle-btn,
+.select-btn {
   padding: 12px;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
@@ -209,7 +225,8 @@ body {
   font-size: 14px;
 }
 
-.toggle-btn:hover, .select-btn:hover {
+.toggle-btn:hover,
+.select-btn:hover {
   background: #f3f4f6;
   border-color: #d1d5db;
 }
@@ -302,7 +319,7 @@ body {
 .card-url {
   font-size: 12px;
   color: #6b7280;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
 }
 
 /* Action Buttons */
@@ -321,7 +338,8 @@ body {
   margin-top: 16px;
 }
 
-.result-success, .result-error {
+.result-success,
+.result-error {
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -337,13 +355,14 @@ body {
   border: 2px solid #ef4444;
 }
 
-.result-title, .error-title {
+.result-title,
+.error-title {
   font-weight: 600;
   margin-bottom: 8px;
 }
 
 .branch-name {
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   background: rgba(255, 255, 255, 0.8);
   padding: 8px 12px;
   border-radius: 6px;
@@ -353,9 +372,21 @@ body {
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.result-details, .error-message {
+.result-details,
+.error-message {
   font-size: 12px;
   opacity: 0.8;
+}
+
+.error-actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.error-actions .btn {
+  font-size: 12px;
+  padding: 8px 12px;
 }
 
 /* Connection Tests */
@@ -432,7 +463,7 @@ body {
   background: #e5e7eb;
   padding: 2px 6px;
   border-radius: 4px;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   font-size: 11px;
 }
 
@@ -467,8 +498,12 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Branch Suggestion */
@@ -500,7 +535,7 @@ body {
 
 .branch-name-preview {
   flex: 1;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 13px;
   color: #0f172a;
   background: #f8fafc;
@@ -554,7 +589,7 @@ body {
 }
 
 .branch-suggestion-loading::before {
-  content: '';
+  content: "";
   width: 12px;
   height: 12px;
   border: 2px solid #bae6fd;
@@ -571,7 +606,7 @@ body {
     min-height: 100vh;
     border-radius: 0;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }

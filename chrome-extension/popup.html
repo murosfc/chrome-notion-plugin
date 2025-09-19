@@ -21,7 +21,7 @@
         <div class="status-indicator" id="statusIndicator">
           <div class="pulse"></div>
         </div>
-        <div class="status-text" id="statusText">Checking configuration...</div>
+        <div class="status-text" id="statusText">Loading interface...</div>
       </div>
 
       <!-- Main Content -->
@@ -142,6 +142,18 @@
             <div class="result-error" id="resultError">
               <div class="error-title">❌ Error</div>
               <div class="error-message" id="errorMessage"></div>
+              <div
+                class="error-actions"
+                id="errorActions"
+                style="display: none"
+              >
+                <button
+                  id="reconfigureApiBtn"
+                  class="btn btn-secondary btn-small"
+                >
+                  🔧 Configure API Key
+                </button>
+              </div>
             </div>
           </div>
         </div>
