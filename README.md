@@ -156,6 +156,11 @@ npm run setup               # Install + start server
 npm run start-server        # Start production server
 npm run dev-server         # Server in development mode
 
+# Windows users can also use batch files
+# Navigate to local-server folder and run:
+# start-server.bat         # Start server on Windows
+# kill-server.bat          # Stop server on Windows
+
 # Testing and diagnostics
 npm run test-git           # Test Git functionality
 npm run test-gemini        # Test Gemini API
@@ -423,6 +428,11 @@ npm run setup               # Instalar + iniciar servidor
 # Servidor
 npm run start-server        # Iniciar servidor de produção
 npm run dev-server         # Servidor em modo desenvolvimento
+
+# Usuários Windows também podem usar arquivos batch
+# Navegue até a pasta local-server e execute:
+# start-server.bat         # Iniciar servidor no Windows
+# kill-server.bat          # Parar servidor no Windows
 
 # Testes e diagnóstico
 npm run test-git           # Testar funcionalidade Git
