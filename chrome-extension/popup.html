@@ -12,7 +12,7 @@
       <div class="header">
         <div class="logo">🚀 <span>Notion Git</span></div>
         <div class="header-controls">
-          <div class="version">v1.0.0</div>
+          <div class="version">v1.1.0</div>
         </div>
       </div>
 
@@ -79,6 +79,24 @@
               </button>
             </div>
             <div class="help-text">Full path to your Git project folder</div>
+          </div>
+
+          <div class="input-group">
+            <label for="defaultBranchInput"
+              >🌿 Default Base Branch (optional):</label
+            >
+            <div class="input-container">
+              <input
+                type="text"
+                id="defaultBranchInput"
+                placeholder="main, develop, master..."
+                class="form-input"
+              />
+            </div>
+            <div class="help-text">
+              Branch base para criar novas branches. Se vazio, usa o branch
+              atual.
+            </div>
           </div>
 
           <button id="saveConfigBtn" class="btn btn-primary">
@@ -206,6 +224,6 @@
       </div>
     </div>
 
-    <script src="popup.js"></script>
+    <script src="dist/popup.js"></script>
   </body>
 </html>

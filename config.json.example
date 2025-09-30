@@ -6,7 +6,8 @@
     "branchPrefix": "auto",
     "defaultBranchType": "feat",
     "maxBranchNameLength": 60,
-    "generateBranchDescription": false
+    "generateBranchDescription": false,
+    "defaultBaseBranch": ""
   },
   "advanced": {
     "gitTimeout": 30000,
@@ -26,6 +27,13 @@
       "auto - Let Gemini decide (feat/, fix/, etc.)",
       "custom - Use a custom prefix",
       "none - No prefix"
+    ],
+    "defaultBaseBranch_help": "Default base branch for creating new branches (e.g., main, develop). If empty, uses current branch.",
+    "defaultBaseBranch_examples": [
+      "main - Most common default branch",
+      "develop - Development branch in GitFlow",
+      "master - Legacy default branch",
+      "'' (empty) - Use current branch as base"
     ]
   }
 }

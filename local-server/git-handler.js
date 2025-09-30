@@ -1,14 +1,13 @@
-const { exec, spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const { exec, spawn } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
 class GitHandler {
   constructor() {
-    this.isWindows = os.platform() === 'win32';
-    this.isLinux = os.platform() === 'linux';
-    this.isMac = os.platform() === 'darwin';
-    
+    this.isWindows = os.platform() === "win32";
+    this.isLinux = os.platform() === "linux";
+    this.isMac = os.platform() === "darwin";
   }
 
   /**
@@ -18,38 +17,36 @@ class GitHandler {
     return new Promise((resolve, reject) => {
       const options = {
         cwd: workingDir,
-        encoding: 'utf8',
+        encoding: "utf8",
         timeout: 30000, // 30 seconds timeout
-        maxBuffer: 1024 * 1024 // 1MB buffer
+        maxBuffer: 1024 * 1024, // 1MB buffer
       };
 
       // Adjust command for Windows if necessary
       const finalCommand = this.isWindows ? `git ${command}` : `git ${command}`;
-      
 
       exec(finalCommand, options, (error, stdout, stderr) => {
         if (error) {
           console.error(`❌ Git command error: ${error.message}`);
           console.error(`📝 stderr: ${stderr}`);
-          
+
           reject({
             message: this.parseGitError(error.message, stderr),
-            code: error.code || 'GIT_ERROR',
+            code: error.code || "GIT_ERROR",
             details: {
               command: finalCommand,
               workingDir,
               stderr: stderr.trim(),
-              stdout: stdout.trim()
-            }
+              stdout: stdout.trim(),
+            },
           });
           return;
         }
 
-
         resolve({
           stdout: stdout.trim(),
           stderr: stderr.trim(),
-          command: finalCommand
+          command: finalCommand,
         });
       });
     });
@@ -59,80 +56,118 @@ class GitHandler {
    * Analyzes and improves Git error messages
    */
   parseGitError(errorMessage, stderr) {
-    const errorText = (stderr || errorMessage || '').toLowerCase();
+    const errorText = (stderr || errorMessage || "").toLowerCase();
 
-    if (errorText.includes('not a git repository')) {
+    if (errorText.includes("not a git repository")) {
       return 'O diretório não é um repositório Git. Execute "git init" primeiro.';
     }
-    
-    if (errorText.includes('already exists')) {
-      return 'Branch já existe. Escolha um nome diferente ou faça checkout do branch existente.';
+
+    if (errorText.includes("already exists")) {
+      return "Branch já existe. Escolha um nome diferente ou faça checkout do branch existente.";
     }
-    
-    if (errorText.includes('fatal: not a valid object name')) {
-      return 'Branch base não existe. Certifique-se de estar em um branch válido.';
+
+    if (errorText.includes("fatal: not a valid object name")) {
+      return "Branch base não existe. Certifique-se de estar em um branch válido.";
     }
-    
-    if (errorText.includes('working tree clean')) {
-      return 'Há alterações não commitadas. Faça commit ou stash das alterações primeiro.';
+
+    if (errorText.includes("working tree clean")) {
+      return "Há alterações não commitadas. Faça commit ou stash das alterações primeiro.";
     }
-    
-    if (errorText.includes('permission denied') || errorText.includes('access denied')) {
-      return 'Permissão negada. Verifique as permissões do diretório.';
+
+    if (
+      errorText.includes("permission denied") ||
+      errorText.includes("access denied")
+    ) {
+      return "Permissão negada. Verifique as permissões do diretório.";
     }
-    
-    if (errorText.includes('command not found') || errorText.includes('is not recognized')) {
-      return 'Git não encontrado. Instale o Git e certifique-se de que está no PATH.';
+
+    if (
+      errorText.includes("command not found") ||
+      errorText.includes("is not recognized")
+    ) {
+      return "Git não encontrado. Instale o Git e certifique-se de que está no PATH.";
     }
-    
+
     // Return original error if cannot interpret
-    return errorMessage || stderr || 'Unknown Git error';
+    return errorMessage || stderr || "Unknown Git error";
   }
 
   /**
-   * Creates a new branch based on current branch
+   * Creates a new branch based on current branch or specified base branch
    * @param {string} branchName - Name of branch to be created
    * @param {string} projectPath - Git project path
    * @param {boolean} autoCheckout - Whether to do automatic checkout (default: true)
+   * @param {string} defaultBaseBranch - Default base branch to create from (optional)
    */
-  async createBranch(branchName, projectPath, autoCheckout = true) {
+  async createBranch(
+    branchName,
+    projectPath,
+    autoCheckout = true,
+    defaultBaseBranch = null
+  ) {
     try {
-
       // 1. Verificar se o repositório é válido
       await this.validateRepository(projectPath);
 
       // 2. Verificar status atual
       const status = await this.getRepoStatus(projectPath);
+      let baseBranch = status.currentBranch;
 
-      // 3. Verificar se o branch já existe
+      // 3. Se um branch padrão foi especificado, fazer checkout para ele primeiro
+      if (defaultBaseBranch && defaultBaseBranch.trim()) {
+        const branches = await this.listBranches(projectPath);
+
+        // Verificar se o branch padrão existe
+        if (branches.all.includes(defaultBaseBranch)) {
+          console.log(
+            `🔄 Switching to default base branch: ${defaultBaseBranch}`
+          );
+          await this.executeGitCommand(
+            `checkout "${defaultBaseBranch}"`,
+            projectPath
+          );
+          baseBranch = defaultBaseBranch;
+        } else {
+          console.warn(
+            `⚠️ Default base branch "${defaultBaseBranch}" not found, using current branch "${baseBranch}"`
+          );
+        }
+      }
+
+      // 4. Verificar se o branch já existe
       const branches = await this.listBranches(projectPath);
       if (branches.all.includes(branchName)) {
         throw new Error(`Branch "${branchName}" already exists`);
       }
 
-      // 4. Criar branch (com ou sem checkout)
+      // 5. Criar branch (com ou sem checkout)
       if (autoCheckout) {
         // Criar e fazer checkout do novo branch
-        await this.executeGitCommand(`checkout -b "${branchName}"`, projectPath);
+        await this.executeGitCommand(
+          `checkout -b "${branchName}"`,
+          projectPath
+        );
       } else {
         // Apenas criar o branch (sem fazer checkout)
         await this.executeGitCommand(`branch "${branchName}"`, projectPath);
       }
 
-      // 5. Verificar status final
+      // 6. Verificar status final
       const newStatus = await this.getRepoStatus(projectPath);
 
       return {
         branchName,
         previousBranch: status.currentBranch,
+        baseBranch: baseBranch,
         currentBranch: newStatus.currentBranch,
         created: true,
         checkedOut: autoCheckout,
-        message: autoCheckout 
-          ? `Branch "${branchName}" criado e ativo a partir de "${status.currentBranch}"`
-          : `Branch "${branchName}" criado a partir de "${status.currentBranch}" (sem checkout)`
+        usedDefaultBaseBranch:
+          defaultBaseBranch && baseBranch === defaultBaseBranch,
+        message: autoCheckout
+          ? `Branch "${branchName}" criado e ativo a partir de "${baseBranch}"`
+          : `Branch "${branchName}" criado a partir de "${baseBranch}" (sem checkout)`,
       };
-
     } catch (error) {
       console.error(`❌ Failed to create branch:`, error);
       throw error;
@@ -145,28 +180,38 @@ class GitHandler {
   async getRepoStatus(projectPath) {
     try {
       // Branch atual
-      const branchResult = await this.executeGitCommand('branch --show-current', projectPath);
-      const currentBranch = branchResult.stdout || 'detached HEAD';
+      const branchResult = await this.executeGitCommand(
+        "branch --show-current",
+        projectPath
+      );
+      const currentBranch = branchResult.stdout || "detached HEAD";
 
       // Status geral
-      const statusResult = await this.executeGitCommand('status --porcelain', projectPath);
+      const statusResult = await this.executeGitCommand(
+        "status --porcelain",
+        projectPath
+      );
       const hasChanges = statusResult.stdout.length > 0;
 
       // Último commit
       let lastCommit = null;
       try {
-        const commitResult = await this.executeGitCommand('log --oneline -1', projectPath);
+        const commitResult = await this.executeGitCommand(
+          "log --oneline -1",
+          projectPath
+        );
         lastCommit = commitResult.stdout;
-      } catch (commitError) {
-      }
+      } catch (commitError) {}
 
       // Remote status (se existir)
       let remoteStatus = null;
       try {
-        const remoteResult = await this.executeGitCommand('remote -v', projectPath);
+        const remoteResult = await this.executeGitCommand(
+          "remote -v",
+          projectPath
+        );
         remoteStatus = remoteResult.stdout;
-      } catch (remoteError) {
-      }
+      } catch (remoteError) {}
 
       return {
         currentBranch,
@@ -174,11 +219,10 @@ class GitHandler {
         lastCommit,
         remoteStatus,
         isClean: !hasChanges,
-        statusDetails: statusResult.stdout
+        statusDetails: statusResult.stdout,
       };
-
     } catch (error) {
-      console.error('❌ Error getting status:', error);
+      console.error("❌ Error getting status:", error);
       throw error;
     }
   }
@@ -189,26 +233,31 @@ class GitHandler {
   async listBranches(projectPath) {
     try {
       // Branches locais
-      const localResult = await this.executeGitCommand('branch', projectPath);
+      const localResult = await this.executeGitCommand("branch", projectPath);
       const localBranches = localResult.stdout
-        .split('\n')
-        .map(branch => branch.replace(/^\*?\s*/, '').trim())
-        .filter(branch => branch.length > 0);
+        .split("\n")
+        .map((branch) => branch.replace(/^\*?\s*/, "").trim())
+        .filter((branch) => branch.length > 0);
 
       // Branch atual
-      const currentResult = await this.executeGitCommand('branch --show-current', projectPath);
+      const currentResult = await this.executeGitCommand(
+        "branch --show-current",
+        projectPath
+      );
       const currentBranch = currentResult.stdout.trim();
 
       // Tentar listar branches remotos
       let remoteBranches = [];
       try {
-        const remoteResult = await this.executeGitCommand('branch -r', projectPath);
+        const remoteResult = await this.executeGitCommand(
+          "branch -r",
+          projectPath
+        );
         remoteBranches = remoteResult.stdout
-          .split('\n')
-          .map(branch => branch.trim().replace(/^origin\//, ''))
-          .filter(branch => branch.length > 0 && !branch.includes('HEAD'));
-      } catch (remoteError) {
-      }
+          .split("\n")
+          .map((branch) => branch.trim().replace(/^origin\//, ""))
+          .filter((branch) => branch.length > 0 && !branch.includes("HEAD"));
+      } catch (remoteError) {}
 
       const allBranches = [...new Set([...localBranches, ...remoteBranches])];
 
@@ -217,11 +266,10 @@ class GitHandler {
         local: localBranches,
         remote: remoteBranches,
         all: allBranches,
-        count: allBranches.length
+        count: allBranches.length,
       };
-
     } catch (error) {
-      console.error('❌ Error listing branches:', error);
+      console.error("❌ Error listing branches:", error);
       throw error;
     }
   }
@@ -243,29 +291,27 @@ class GitHandler {
       }
 
       // Verificar se pasta .git existe
-      const gitPath = path.join(projectPath, '.git');
+      const gitPath = path.join(projectPath, ".git");
       if (!fs.existsSync(gitPath)) {
-        throw new Error('Not a valid Git repository (.git not found)');
+        throw new Error("Not a valid Git repository (.git not found)");
       }
 
       // Tentar executar comando Git simples
-      await this.executeGitCommand('status', projectPath);
+      await this.executeGitCommand("status", projectPath);
 
       // Verificar se Git está instalado
       try {
-        await this.executeGitCommand('--version', projectPath);
+        await this.executeGitCommand("--version", projectPath);
       } catch (gitError) {
-        throw new Error('Git is not installed or not in PATH');
+        throw new Error("Git is not installed or not in PATH");
       }
-
 
       return {
         isValid: true,
         path: projectPath,
         gitVersion: await this.getGitVersion(projectPath),
-        message: 'Valid Git repository'
+        message: "Valid Git repository",
       };
-
     } catch (error) {
       console.error(`❌ Validation failed:`, error);
       throw error;
@@ -277,10 +323,10 @@ class GitHandler {
    */
   async getGitVersion(projectPath) {
     try {
-      const result = await this.executeGitCommand('--version', projectPath);
+      const result = await this.executeGitCommand("--version", projectPath);
       return result.stdout;
     } catch (error) {
-      return 'Versão desconhecida';
+      return "Versão desconhecida";
     }
   }
 
@@ -291,13 +337,13 @@ class GitHandler {
     return {
       platform: os.platform(),
       arch: os.arch(),
-      version: os.version ? os.version() : 'N/A',
+      version: os.version ? os.version() : "N/A",
       nodeVersion: process.version,
       isWindows: this.isWindows,
       isLinux: this.isLinux,
       isMac: this.isMac,
       homeDir: os.homedir(),
-      workingDir: process.cwd()
+      workingDir: process.cwd(),
     };
   }
 
@@ -307,18 +353,18 @@ class GitHandler {
   async testGitInstallation() {
     try {
       const testDir = process.cwd();
-      const result = await this.executeGitCommand('--version', testDir);
-      
+      const result = await this.executeGitCommand("--version", testDir);
+
       return {
         isInstalled: true,
         version: result.stdout,
-        message: 'Git instalado e funcionando'
+        message: "Git instalado e funcionando",
       };
     } catch (error) {
       return {
         isInstalled: false,
         error: error.message,
-        message: 'Git não encontrado ou não funcional'
+        message: "Git não encontrado ou não funcional",
       };
     }
   }

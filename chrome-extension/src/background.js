@@ -1,15 +1,17 @@
-// Background Service Worker - Gemini API Integration
+// Background Service Worker - Gemini API Integration using Official SDK
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 class GeminiAPIClient {
   constructor() {
-    // URLs possíveis da API Gemini (testamos em ordem de preferência)
-    this.possibleURLs = [
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
-      "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent",
-    ];
-    this.baseURL = this.possibleURLs[0]; // Começar com a primeira
+    this.genAI = null;
+    this.model = null;
+    this.apiKey = null;
+    this.projectPath = null;
+    this.defaultBaseBranch = null;
+
+    // Usar Gemini 2.5 Flash-Lite (mais rápido e eficiente)
+    this.modelName = "gemini-2.0-flash-exp";
+
     this.setupMessageListener();
     this.loadConfiguration();
   }
@@ -24,14 +26,47 @@ class GeminiAPIClient {
       this.apiKey = result.geminiApiKey;
       this.projectPath = result.projectPath;
       this.defaultBaseBranch = result.defaultBaseBranch;
+
+      // Inicializar o cliente da API se temos a chave
+      if (this.apiKey) {
+        this.initializeGeminiClient();
+      }
     } catch (error) {
       console.error("❌ Error loading configuration:", error);
+    }
+  }
+
+  initializeGeminiClient() {
+    try {
+      console.log("🔍 Initializing Gemini client with model:", this.modelName);
+      this.genAI = new GoogleGenerativeAI(this.apiKey);
+      this.model = this.genAI.getGenerativeModel({
+        model: this.modelName,
+        generationConfig: {
+          temperature: 0.3,
+          topK: 20,
+          topP: 0.8,
+          maxOutputTokens: 100,
+        },
+      });
+      console.log("✅ Gemini client initialized successfully");
+    } catch (error) {
+      console.error("❌ Error initializing Gemini client:", error);
+      throw error;
     }
   }
 
   async saveConfiguration(config) {
     try {
       await chrome.storage.sync.set(config);
+
+      // Reinicializar cliente se a API key mudou
+      if (config.geminiApiKey !== undefined) {
+        this.apiKey = config.geminiApiKey;
+        if (this.apiKey) {
+          this.initializeGeminiClient();
+        }
+      }
     } catch (error) {
       console.error("❌ Error saving configuration:", error);
       throw error;
@@ -83,224 +118,117 @@ Return ONLY the branch name, without additional explanations.`;
     return prompt;
   }
 
-  // Test different API URLs to find the working one
-  async findWorkingAPIURL() {
-    if (!this.apiKey) {
-      throw new Error("API key not configured");
-    }
-
-    console.log("🔍 Testing different API URLs to find working endpoint...");
-
-    for (let i = 0; i < this.possibleURLs.length; i++) {
-      const testURL = this.possibleURLs[i];
-      console.log(
-        `🔍 Testing URL ${i + 1}/${this.possibleURLs.length}:`,
-        testURL
-      );
-
-      try {
-        const response = await fetch(`${testURL}?key=${this.apiKey}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: "test" }] }],
-          }),
-        });
-
-        console.log(`🔍 URL ${i + 1} response:`, {
-          status: response.status,
-          statusText: response.statusText,
-          ok: response.ok,
-        });
-
-        if (response.ok) {
-          console.log(`✅ Found working URL: ${testURL}`);
-          this.baseURL = testURL;
-          return testURL;
-        } else if (response.status !== 404) {
-          // Se não é 404, pode ser problema de API key, não de URL
-          console.log(
-            `⚠️ URL ${i + 1} exists but returned ${
-              response.status
-            }, might be API key issue`
-          );
-          this.baseURL = testURL;
-          return testURL;
-        }
-      } catch (error) {
-        console.log(`❌ URL ${i + 1} failed:`, error.message);
-      }
-    }
-
-    throw new Error(
-      "No working API URL found. Please check if the Gemini API is available."
-    );
-  }
-
-  // Calls Gemini API to generate branch name
+  // Calls Gemini API to generate branch name using official SDK
   async generateBranchName(cardData, previousBranchName = null) {
     console.log("🔍 generateBranchName called with:", {
       hasApiKey: !!this.apiKey,
+      hasModel: !!this.model,
+      modelName: this.modelName,
       apiKeyLength: this.apiKey ? this.apiKey.length : 0,
       apiKeyPrefix: this.apiKey ? this.apiKey.substring(0, 10) + "..." : "none",
-      baseURL: this.baseURL,
     });
 
     if (!this.apiKey) {
       throw new Error("Gemini API key not configured");
     }
 
+    if (!this.model) {
+      console.log("🔄 Model not initialized, initializing now...");
+      this.initializeGeminiClient();
+    }
+
     const prompt = this.generateBranchPrompt(cardData, previousBranchName);
 
     try {
-      const requestURL = `${this.baseURL}?key=${this.apiKey}`;
-      console.log(
-        "🔍 Making API request to:",
-        requestURL.replace(this.apiKey, "***API_KEY***")
-      );
+      console.log("🔍 Making API request using official SDK...");
 
-      const response = await fetch(requestURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.3, // Less creative, more consistent
-            topK: 20,
-            topP: 0.8,
-            maxOutputTokens: 100,
-          },
-        }),
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      const generatedText = response.text().trim();
+
+      console.log("✅ API request successful:", {
+        responseLength: generatedText.length,
+        responsePreview: generatedText.substring(0, 50) + "...",
       });
-
-      console.log("🔍 API Response received:", {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        headers: Object.fromEntries(response.headers.entries()),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ Gemini API error details:", {
-          status: response.status,
-          statusText: response.statusText,
-          errorText: errorText,
-          url: response.url.replace(this.apiKey, "***API_KEY***"),
-          requestHeaders: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        // Se for 404, tentar encontrar URL correta
-        if (response.status === 404) {
-          console.log("🔍 Got 404, trying to find correct API URL...");
-          try {
-            await this.findWorkingAPIURL();
-            console.log("🔄 Retrying with new URL:", this.baseURL);
-
-            // Tentar novamente com a nova URL
-            const retryURL = `${this.baseURL}?key=${this.apiKey}`;
-            const retryResponse = await fetch(retryURL, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                contents: [
-                  {
-                    parts: [
-                      {
-                        text: prompt,
-                      },
-                    ],
-                  },
-                ],
-                generationConfig: {
-                  temperature: 0.3,
-                  topK: 20,
-                  topP: 0.8,
-                  maxOutputTokens: 100,
-                },
-              }),
-            });
-
-            if (retryResponse.ok) {
-              const retryData = await retryResponse.json();
-              const generatedText =
-                retryData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-
-              if (generatedText) {
-                const branchName = this.sanitizeBranchName(generatedText);
-                console.log("✅ Retry successful with new URL");
-                return branchName;
-              }
-            }
-          } catch (urlError) {
-            console.error("❌ Failed to find working URL:", urlError);
-          }
-        }
-
-        let errorMessage;
-        switch (response.status) {
-          case 400:
-            errorMessage =
-              "Error 400: Invalid API key or incorrect parameters. Please check your Gemini API key configuration.";
-            break;
-          case 401:
-            errorMessage =
-              "Error 401: API key not authorized. Your API key may be invalid or expired. Please reconfigure your API key.";
-            break;
-          case 403:
-            errorMessage =
-              "Error 403: Gemini API not enabled. Enable the Generative Language API in Google Cloud Console or check your API key permissions.";
-            break;
-          case 404:
-            errorMessage =
-              "Error 404: Gemini model not found. The API endpoint may have changed. Please check if you are using the correct model.";
-            break;
-          case 429:
-            errorMessage =
-              "Error 429: Quota limit exceeded. You have reached your API usage limit. Try again later or check your quota in Google Cloud Console.";
-            break;
-          case 500:
-            errorMessage =
-              "Error 500: Internal Gemini API error. This is a temporary server issue. Please try again in a few moments.";
-            break;
-          default:
-            errorMessage = `Error ${response.status}: ${errorText}. Please check your API key configuration.`;
-        }
-
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-
-      const generatedText =
-        data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
       if (!generatedText) {
-        throw new Error("Invalid response from Gemini API");
+        throw new Error("Empty response from Gemini API");
       }
 
       // Limpar e validar o nome do branch
       const branchName = this.sanitizeBranchName(generatedText);
+      console.log("✅ Branch name generated:", branchName);
 
       return branchName;
     } catch (error) {
       console.error("❌ Error calling Gemini API:", error);
+
+      // Tratar erros específicos do SDK
+      if (error.message.includes("API_KEY_INVALID")) {
+        throw new Error(
+          "Error 401: Invalid API key - please reconfigure your Gemini API key."
+        );
+      } else if (error.message.includes("PERMISSION_DENIED")) {
+        throw new Error(
+          "Error 403: Gemini API not enabled. Enable the Generative Language API in Google Cloud Console."
+        );
+      } else if (error.message.includes("QUOTA_EXCEEDED")) {
+        throw new Error(
+          "Error 429: Quota limit exceeded. You have reached your API usage limit."
+        );
+      } else if (error.message.includes("MODEL_NOT_FOUND")) {
+        console.log("⚠️ Model not found, trying fallback model...");
+        return await this.tryFallbackModel(cardData, previousBranchName);
+      }
+
       throw error;
     }
+  }
+
+  // Tentar modelos alternativos se o principal falhar
+  async tryFallbackModel(cardData, previousBranchName = null) {
+    const fallbackModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+
+    for (const modelName of fallbackModels) {
+      try {
+        console.log(`🔄 Trying fallback model: ${modelName}`);
+
+        const fallbackModel = this.genAI.getGenerativeModel({
+          model: modelName,
+          generationConfig: {
+            temperature: 0.3,
+            topK: 20,
+            topP: 0.8,
+            maxOutputTokens: 100,
+          },
+        });
+
+        const prompt = this.generateBranchPrompt(cardData, previousBranchName);
+        const result = await fallbackModel.generateContent(prompt);
+        const response = await result.response;
+        const generatedText = response.text().trim();
+
+        if (generatedText) {
+          console.log(`✅ Fallback model ${modelName} worked!`);
+          // Atualizar modelo principal para o que funcionou
+          this.model = fallbackModel;
+          this.modelName = modelName;
+
+          const branchName = this.sanitizeBranchName(generatedText);
+          return branchName;
+        }
+      } catch (fallbackError) {
+        console.log(
+          `❌ Fallback model ${modelName} failed:`,
+          fallbackError.message
+        );
+        continue;
+      }
+    }
+
+    throw new Error(
+      "All Gemini models failed. Please check your API key and try again."
+    );
   }
 
   // Sanitiza e valida o nome do branch
@@ -594,19 +522,20 @@ Return ONLY the branch name, without additional explanations.`;
     }
   }
 
-  // Test connections (Gemini API + Local Server)
+  // Test connections (Gemini API + Local Server) using official SDK
   async handleTestConnection() {
     const results = {
       geminiAPI: { status: "unknown", message: "" },
       localServer: { status: "unknown", message: "" },
     };
 
-    // Testar Gemini API
+    // Testar Gemini API usando SDK oficial
     try {
-      console.log("🔍 Testing Gemini API connection:", {
+      console.log("🔍 Testing Gemini API connection using official SDK:", {
         hasApiKey: !!this.apiKey,
+        hasModel: !!this.model,
+        modelName: this.modelName,
         apiKeyLength: this.apiKey ? this.apiKey.length : 0,
-        baseURL: this.baseURL,
       });
 
       if (!this.apiKey) {
@@ -615,100 +544,55 @@ Return ONLY the branch name, without additional explanations.`;
           message: "API key not configured. Please set up your Gemini API key.",
         };
       } else {
-        const testURL = `${this.baseURL}?key=${this.apiKey}`;
-        console.log(
-          "🔍 Test request URL:",
-          testURL.replace(this.apiKey, "***API_KEY***")
-        );
+        // Inicializar cliente se necessário
+        if (!this.model) {
+          this.initializeGeminiClient();
+        }
 
-        const testResponse = await fetch(testURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: "test" }] }],
-          }),
-        });
+        // Fazer teste simples
+        const result = await this.model.generateContent("test");
+        const response = await result.response;
+        const text = response.text();
 
-        console.log("🔍 Test response:", {
-          status: testResponse.status,
-          statusText: testResponse.statusText,
-          ok: testResponse.ok,
-        });
-
-        if (testResponse.ok) {
-          const responseData = await testResponse.json();
-          console.log("✅ Test successful, response data:", responseData);
+        if (text) {
+          console.log("✅ Gemini API test successful");
           results.geminiAPI = {
             status: "success",
-            message: "Gemini API working",
+            message: `Gemini API working (${this.modelName})`,
           };
         } else {
-          const errorText = await testResponse.text();
-          console.error("❌ Test failed, error details:", {
-            status: testResponse.status,
-            statusText: testResponse.statusText,
-            errorText: errorText,
-          });
-
-          // Se for 404, tentar encontrar URL correta
-          if (testResponse.status === 404) {
-            console.log("🔍 Test got 404, trying to find correct API URL...");
-            try {
-              await this.findWorkingAPIURL();
-              console.log("🔄 Retesting with new URL:", this.baseURL);
-
-              // Testar novamente com a nova URL
-              const retestURL = `${this.baseURL}?key=${this.apiKey}`;
-              const retestResponse = await fetch(retestURL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  contents: [{ parts: [{ text: "test" }] }],
-                }),
-              });
-
-              if (retestResponse.ok) {
-                console.log("✅ Retest successful with new URL");
-                results.geminiAPI = {
-                  status: "success",
-                  message: "Gemini API working (found correct URL)",
-                };
-                return results;
-              }
-            } catch (urlError) {
-              console.error(
-                "❌ Failed to find working URL during test:",
-                urlError
-              );
-            }
-          }
-
-          let errorMsg = "";
-          switch (testResponse.status) {
-            case 401:
-              errorMsg = "Invalid API key - please reconfigure";
-              break;
-            case 403:
-              errorMsg = "API not enabled or no permissions";
-              break;
-            case 404:
-              errorMsg = "API endpoint not found - may need to update plugin";
-              break;
-            case 429:
-              errorMsg = "Quota exceeded - try again later";
-              break;
-            default:
-              errorMsg = `Error ${testResponse.status} - check API key`;
-          }
-          results.geminiAPI = { status: "error", message: errorMsg };
+          throw new Error("Empty response from API");
         }
       }
     } catch (error) {
-      console.error("❌ Exception during API test:", error);
-      results.geminiAPI = {
-        status: "error",
-        message: "Connection failed - check API key: " + error.message,
-      };
+      console.error("❌ Gemini API test failed:", error);
+
+      let errorMsg = "Connection failed - check API key";
+
+      if (error.message.includes("API_KEY_INVALID")) {
+        errorMsg = "Invalid API key - please reconfigure";
+      } else if (error.message.includes("PERMISSION_DENIED")) {
+        errorMsg = "API not enabled or no permissions";
+      } else if (error.message.includes("QUOTA_EXCEEDED")) {
+        errorMsg = "Quota exceeded - try again later";
+      } else if (error.message.includes("MODEL_NOT_FOUND")) {
+        errorMsg = "Model not available - trying fallback";
+
+        // Tentar modelo fallback
+        try {
+          await this.tryFallbackModel({ title: "test" });
+          results.geminiAPI = {
+            status: "success",
+            message: `Gemini API working (fallback: ${this.modelName})`,
+          };
+        } catch (fallbackError) {
+          errorMsg = "All models failed - check API key";
+        }
+      }
+
+      if (results.geminiAPI.status !== "success") {
+        results.geminiAPI = { status: "error", message: errorMsg };
+      }
     }
 
     // Testar servidor local

@@ -42,7 +42,7 @@ class LocalServer {
         status: "OK",
         message: "Local Git server working",
         timestamp: new Date().toISOString(),
-        version: "1.0.0",
+        version: "1.1.0",
       });
     });
 
@@ -74,6 +74,7 @@ class LocalServer {
           config: {
             geminiApiKey: hasApiKey ? config.geminiApiKey : null,
             projectPath: hasProjectPath ? config.projectPath : null,
+            defaultBaseBranch: config.settings?.defaultBaseBranch || "",
             hasApiKey,
             hasProjectPath,
             settings: config.settings || {},
@@ -102,7 +103,7 @@ class LocalServer {
     // Create branch
     this.app.post("/create-branch", async (req, res) => {
       try {
-        const { branchName, projectPath } = req.body;
+        const { branchName, projectPath, defaultBaseBranch } = req.body;
 
         // Validation
         if (!branchName || !projectPath) {
@@ -134,7 +135,8 @@ class LocalServer {
         const result = await this.gitHandler.createBranch(
           branchName,
           projectPath,
-          true
+          true,
+          defaultBaseBranch
         );
 
         res.json({

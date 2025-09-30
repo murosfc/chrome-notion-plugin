@@ -15,6 +15,9 @@ Intelligent Chrome plugin that automates Git branch creation based on Notion car
 - 🎨 **Modern Interface**: Clean and intuitive design
 - ⚡ **Fast and Secure**: Local processing, no sensitive data sent
 - 🌍 **English Interface**: Clean and intuitive user interface
+- 🔧 **Smart Error Handling**: Automatic API key reconfiguration on errors
+- 🌿 **Default Base Branch**: Configure a default branch for new branches (main, develop, etc.)
+- 📜 **Cross-platform Scripts**: Native scripts for Windows (.bat), Linux (.sh), and macOS
 
 ## 📁 Project Structure
 
@@ -32,7 +35,14 @@ chrome-notion-plugin/
 │   ├── server.js            # Main Express server
 │   ├── git-handler.js       # Git commands handler
 │   ├── package.json         # Server dependencies
-│   └── test-git.js          # Test scripts
+│   ├── test-git.js          # Test scripts
+│   ├── start-server.bat     # Windows server launcher
+│   ├── kill-server.bat      # Windows server killer
+│   ├── start-server.sh      # Linux server launcher
+│   ├── kill-server.sh       # Linux server killer
+│   ├── start-server-macos.sh # macOS optimized launcher
+│   ├── kill-server-macos.sh # macOS optimized killer
+│   └── start-server-unix.sh # Universal Unix launcher
 ├── config.json.example       # 📋 Configuration template
 ├── CONFIGURACAO_API.md      # 🔑 API configuration guide
 ├── install.js               # 🔧 Automated installation script
@@ -62,11 +72,16 @@ npm run start-server
 cd local-server
 npm install
 
-# 2. Go back to root and configure
+# 2. Build Chrome extension (required for v1.1.0+)
+cd ../chrome-extension
+npm install
+npm run build
+
+# 3. Go back to root and configure
 cd ..
 cp config.json.example config.json
 
-# 3. Start server
+# 4. Start server
 cd local-server
 npm start
 ```
@@ -106,6 +121,15 @@ On first run, provide the full path to your Git project.
 - Windows: `C:\projects\my-app`
 - Linux/Mac: `/home/user/projects/my-app`
 
+### 4. 🌿 Configure Default Base Branch (Optional)
+
+You can set a default base branch that will be used as the starting point for all new branches:
+
+- **main**: Most common modern default
+- **develop**: For GitFlow workflow
+- **master**: Legacy default branch
+- **Empty**: Uses current branch as base (default behavior)
+
 ## 📝 How to Use
 
 ### Basic Flow
@@ -138,6 +162,36 @@ cd /your/project
 git checkout -b "feat/implement-google-oauth-authentication"
 ```
 
+## 🆕 New Features (v1.1.0)
+
+### 🔧 Smart Error Handling
+
+- **Automatic API Key Recovery**: When API errors occur, a "🔑 Atualizar API Key" button appears
+- **One-click Reconfiguration**: Quickly fix API key issues without manual navigation
+- **Comprehensive Error Detection**: Handles all API error types (400, 401, 403, 404, etc.)
+
+### 🌿 Default Base Branch Configuration
+
+- **Flexible Branch Creation**: Set a default base branch for all new branches
+- **GitFlow Support**: Perfect for teams using `develop` as base branch
+- **Fallback Behavior**: Uses current branch if default branch doesn't exist
+- **Optional Setting**: Leave empty to maintain current behavior
+
+### 📜 Cross-Platform Scripts
+
+- **Windows**: `start-server.bat` and `kill-server.bat` (existing)
+- **Linux**: `start-server.sh` and `kill-server.sh` (new)
+- **macOS**: `start-server-macos.sh` and `kill-server-macos.sh` (optimized)
+- **Universal**: `start-server-unix.sh` (auto-detects OS)
+
+### 🚀 Official Google AI SDK Integration
+
+- **Official Package**: Now uses `@google/generative-ai` official SDK
+- **Gemini 2.0 Flash**: Updated to use the latest Gemini 2.0 Flash model
+- **Automatic Fallback**: Falls back to older models if newest isn't available
+- **Better Error Handling**: More precise error messages and handling
+- **No Manual URL Management**: SDK handles all API endpoints automatically
+
 ## 🧪 Testing Installation
 
 ```bash
@@ -162,10 +216,21 @@ npm run setup               # Install + start server
 npm run start-server        # Start production server
 npm run dev-server         # Server in development mode
 
-# Windows users can also use batch files
-# Navigate to local-server folder and run:
-# start-server.bat         # Start server on Windows
-# kill-server.bat          # Stop server on Windows
+# Platform-specific scripts (navigate to local-server folder first)
+# Windows:
+start-server.bat           # Start server on Windows
+kill-server.bat            # Stop server on Windows
+
+# Linux:
+./start-server.sh          # Start server on Linux
+./kill-server.sh           # Stop server on Linux
+
+# macOS:
+./start-server-macos.sh    # Start server on macOS (optimized)
+./kill-server-macos.sh     # Stop server on macOS (optimized)
+
+# Universal Unix (auto-detects Linux/macOS):
+./start-server-unix.sh     # Universal launcher for Unix systems
 
 # Testing and diagnostics
 npm run test-git           # Test Git functionality
@@ -193,13 +258,15 @@ npm run build              # Project build (placeholder)
 3. Check logs in Console (F12)
 ```
 
-#### "Error 404 on Gemini API"
+#### "API Key Errors (400, 401, 403, 404, etc.)"
 
 ```bash
-1. Check your Gemini API key
-2. Configure project in Google Cloud Console
-3. Enable "Generative Language API"
-4. Use gemini-1.5-flash model (current)
+1. Click "🔑 Atualizar API Key" button when error appears
+2. Reconfigure your Gemini API key
+3. Test connection again
+4. Check Google Cloud Console if problems persist
+5. Enable "Generative Language API"
+6. Plugin automatically detects correct Gemini model version
 ```
 
 #### "Local server not running"
@@ -247,7 +314,8 @@ npm start
     "serverPort": 3000,
     "branchPrefix": "auto",
     "maxBranchNameLength": 60,
-    "defaultBranchType": "feat"
+    "defaultBranchType": "feat",
+    "defaultBaseBranch": "main"
   }
 }
 ```
@@ -294,6 +362,9 @@ Plugin inteligente para Chrome que automatiza a criação de branches Git basead
 - 🖥️ **Multiplataforma**: Funciona no Windows, Linux e Mac
 - 🎨 **Interface Moderna**: Design limpo e intuitivo
 - ⚡ **Rápido e Seguro**: Processamento local, sem envio de dados sensíveis
+- 🔧 **Tratamento Inteligente de Erros**: Reconfiguração automática da API key em erros
+- 🌿 **Branch Base Padrão**: Configure um branch padrão para novas branches (main, develop, etc.)
+- 📜 **Scripts Multiplataforma**: Scripts nativos para Windows (.bat), Linux (.sh) e macOS
 
 ## 📁 Estrutura do Projeto
 
@@ -311,7 +382,14 @@ chrome-notion-plugin/
 │   ├── server.js            # Servidor Express principal
 │   ├── git-handler.js       # Manipulação de comandos Git
 │   ├── package.json         # Dependências do servidor
-│   └── test-git.js          # Scripts de teste
+│   ├── test-git.js          # Scripts de teste
+│   ├── start-server.bat     # Iniciador do servidor Windows
+│   ├── kill-server.bat      # Finalizador do servidor Windows
+│   ├── start-server.sh      # Iniciador do servidor Linux
+│   ├── kill-server.sh       # Finalizador do servidor Linux
+│   ├── start-server-macos.sh # Iniciador otimizado para macOS
+│   ├── kill-server-macos.sh # Finalizador otimizado para macOS
+│   └── start-server-unix.sh # Iniciador universal Unix
 ├── config.json.example       # 📋 Arquivo de configuração modelo
 ├── CONFIGURACAO_API.md      # 🔑 Guia de configuração da API
 ├── install.js               # 🔧 Script de instalação automatizada
@@ -341,11 +419,16 @@ npm run start-server
 cd local-server
 npm install
 
-# 2. Volte para a raiz e configure
+# 2. Compile a extensão Chrome (obrigatório para v1.1.0+)
+cd ../chrome-extension
+npm install
+npm run build
+
+# 3. Volte para a raiz e configure
 cd ..
 cp config.json.example config.json
 
-# 3. Inicie o servidor
+# 4. Inicie o servidor
 cd local-server
 npm start
 ```
@@ -417,6 +500,28 @@ cd /seu/projeto
 git checkout -b "feat/implement-google-oauth-authentication"
 ```
 
+## 🆕 Novas Funcionalidades (v1.1.0)
+
+### 🔧 Tratamento Inteligente de Erros
+
+- **Recuperação Automática da API Key**: Quando erros da API ocorrem, aparece botão "🔑 Atualizar API Key"
+- **Reconfiguração com Um Clique**: Corrija problemas da API key rapidamente
+- **Detecção Abrangente de Erros**: Trata todos os tipos de erro da API (400, 401, 403, 404, etc.)
+
+### 🌿 Configuração de Branch Base Padrão
+
+- **Criação Flexível de Branches**: Defina um branch base padrão para todas as novas branches
+- **Suporte ao GitFlow**: Perfeito para equipes que usam `develop` como branch base
+- **Comportamento de Fallback**: Usa o branch atual se o branch padrão não existir
+- **Configuração Opcional**: Deixe vazio para manter o comportamento atual
+
+### 📜 Scripts Multiplataforma
+
+- **Windows**: `start-server.bat` e `kill-server.bat` (existentes)
+- **Linux**: `start-server.sh` e `kill-server.sh` (novos)
+- **macOS**: `start-server-macos.sh` e `kill-server-macos.sh` (otimizados)
+- **Universal**: `start-server-unix.sh` (detecta automaticamente o SO)
+
 ## 🧪 Testando a Instalação
 
 ```bash
@@ -441,10 +546,21 @@ npm run setup               # Instalar + iniciar servidor
 npm run start-server        # Iniciar servidor de produção
 npm run dev-server         # Servidor em modo desenvolvimento
 
-# Usuários Windows também podem usar arquivos batch
-# Navegue até a pasta local-server e execute:
-# start-server.bat         # Iniciar servidor no Windows
-# kill-server.bat          # Parar servidor no Windows
+# Scripts específicos por plataforma (navegue até a pasta local-server primeiro)
+# Windows:
+start-server.bat           # Iniciar servidor no Windows
+kill-server.bat            # Parar servidor no Windows
+
+# Linux:
+./start-server.sh          # Iniciar servidor no Linux
+./kill-server.sh           # Parar servidor no Linux
+
+# macOS:
+./start-server-macos.sh    # Iniciar servidor no macOS (otimizado)
+./kill-server-macos.sh     # Parar servidor no macOS (otimizado)
+
+# Universal Unix (detecta automaticamente Linux/macOS):
+./start-server-unix.sh     # Iniciador universal para sistemas Unix
 
 # Testes e diagnóstico
 npm run test-git           # Testar funcionalidade Git
@@ -470,13 +586,15 @@ npm run build              # Build do projeto (placeholder)
 3. Verifique logs no Console (F12)
 ```
 
-#### "Erro 404 no Gemini API"
+#### "Erros da API Key (400, 401, 403, 404, etc.)"
 
 ```bash
-1. Verifique sua chave API Gemini
-2. Configure projeto no Google Cloud Console
-3. Ative a "Generative Language API"
-4. Use modelo gemini-1.5-flash (atual)
+1. Clique no botão "🔑 Atualizar API Key" quando o erro aparecer
+2. Reconfigure sua chave API Gemini
+3. Teste a conexão novamente
+4. Verifique o Google Cloud Console se problemas persistirem
+5. Ative a "Generative Language API"
+6. Plugin detecta automaticamente a versão correta do modelo Gemini
 ```
 
 #### "Servidor local não está rodando"
@@ -524,7 +642,8 @@ npm start
     "serverPort": 3000,
     "branchPrefix": "auto",
     "maxBranchNameLength": 60,
-    "defaultBranchType": "feat"
+    "defaultBranchType": "feat",
+    "defaultBaseBranch": "main"
   }
 }
 ```

@@ -1,13 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Notion Git Branch Creator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cria branches Git automaticamente baseado em cards do Notion usando IA Gemini",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "tabs"
-  ],
+  "permissions": ["activeTab", "storage", "tabs"],
   "host_permissions": [
     "https://www.notion.so/*",
     "https://notion.so/*",
@@ -15,17 +11,12 @@
     "http://localhost:3000/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "dist/background.js"
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://www.notion.so/*",
-        "https://notion.so/*"
-      ],
-      "js": [
-        "content-script.js"
-      ],
+      "matches": ["https://www.notion.so/*", "https://notion.so/*"],
+      "js": ["dist/content-script.js"],
       "run_at": "document_end"
     }
   ],
@@ -47,13 +38,8 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [
-        "content-script.js"
-      ],
-      "matches": [
-        "https://www.notion.so/*",
-        "https://notion.so/*"
-      ]
+      "resources": ["content-script.js"],
+      "matches": ["https://www.notion.so/*", "https://notion.so/*"]
     }
   ]
 }
