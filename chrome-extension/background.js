@@ -63,22 +63,23 @@ Title: "${title}"`;
 
     prompt += `
 
-🎯 BRANCH NAME RULES:
-1. Use format: type/brief-description
-2. Valid types: feat, fix, docs, style, refactor, test, chore
-3. Description should be max 50 characters
-4. Use only lowercase letters, numbers and hyphens
+🎯 BRANCH NAMING RULES:
+1. Format: type/short-description
+2. Allowed types: feat, fix, docs, style, refactor, test, chore
+3. Description: Max 50 characters
+4. Use lowercase, numbers, and hyphens only
 5. Be specific but concise
-6. Use technical English when appropriate
+6. Prefer technical English
+7. Do not use spaces, underscores, or special characters
 
 📝 EXAMPLES:
-- "Implement user authentication" → feat/user-authentication  
+- "Implement user authentication" → feat/user-authentication
 - "Fix shopping cart bug" → fix/shopping-cart-bug
 - "Add unit tests" → test/unit-tests
 - "Update API documentation" → docs/api-documentation
 
-🎪 RESPONSE:
-Return ONLY the branch name, without additional explanations.`;
+🎪 OUTPUT REQUIREMENT:
+Return only the branch name, no explanations or extra text.`;
 
     return prompt;
   }
