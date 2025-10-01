@@ -72,7 +72,7 @@ npm run start-server
 cd local-server
 npm install
 
-# 2. Build Chrome extension (required for v1.1.0+)
+# 2. Build Chrome extension (MANDATORY - extension won't load without this!)
 cd ../chrome-extension
 npm install
 npm run build
@@ -258,6 +258,21 @@ npm run build              # Project build (placeholder)
 3. Check logs in Console (F12)
 ```
 
+#### "Could not load background script" / "Could not load manifest"
+
+This error occurs when the Chrome extension files haven't been built yet.
+
+```bash
+# Solution:
+cd chrome-extension
+npm install
+npm run build
+
+# Then reload the extension in Chrome
+```
+
+**Why this happens:** The manifest.json references files in the `dist/` folder that are only created after running the build command.
+
 #### "API Key Errors (400, 401, 403, 404, etc.)"
 
 ```bash
@@ -419,7 +434,7 @@ npm run start-server
 cd local-server
 npm install
 
-# 2. Compile a extensão Chrome (obrigatório para v1.1.0+)
+# 2. Compile a extensão Chrome (OBRIGATÓRIO - extensão não carregará sem isso!)
 cd ../chrome-extension
 npm install
 npm run build
@@ -585,6 +600,21 @@ npm run build              # Build do projeto (placeholder)
 2. Recarregue a página do Notion (F5)
 3. Verifique logs no Console (F12)
 ```
+
+#### "Não foi possível carregar o script de plano de fundo" / "Não foi possível carregar o manifesto"
+
+Este erro ocorre quando os arquivos da extensão Chrome não foram compilados ainda.
+
+```bash
+# Solução:
+cd chrome-extension
+npm install
+npm run build
+
+# Depois recarregue a extensão no Chrome
+```
+
+**Por que acontece:** O manifest.json referencia arquivos na pasta `dist/` que só são criados após executar o comando build.
 
 #### "Erros da API Key (400, 401, 403, 404, etc.)"
 

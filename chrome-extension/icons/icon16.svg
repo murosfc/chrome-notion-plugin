@@ -1,43 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background rounded rectangle -->
-  <rect x="0.5" y="0.5" 
-        width="15" height="15" 
-        rx="2" ry="2" 
-        fill="white" 
-        stroke="#1a2332" 
-        stroke-width="1"/>
-  
-  <!-- Letter N -->
-  <text x="5.6" y="10.4" 
-        font-family="Arial, sans-serif" 
-        font-size="6.4" 
-        font-weight="bold" 
-        fill="#1a2332">N</text>
-  
-  <!-- Git network nodes and connections -->
-  <g stroke="#1a2332" stroke-width="0.8" fill="#1a2332">
-    <!-- Top right node -->
-    <circle cx="12" cy="4.8" r="0.8"/>
-    
-    <!-- Middle right node -->
-    <circle cx="12.8" cy="8.8" r="0.8"/>
-    
-    <!-- Bottom right node -->
-    <circle cx="10.4" cy="12.8" r="0.8"/>
-    
-    <!-- Connection lines -->
-    <path d="M 12 5.6 
-             Q 13.12 6.72 12.8 8"
-          stroke="#1a2332" stroke-width="0.6" fill="none"/>
-    
-    <path d="M 12.8 9.600000000000001 
-             Q 11.52 10.88 10.4 12"
-          stroke="#1a2332" stroke-width="0.6" fill="none"/>
-    
-    <!-- White centers for nodes -->
-    <circle cx="12" cy="4.8" r="0.32000000000000006" fill="white"/>
-    <circle cx="12.8" cy="8.8" r="0.32000000000000006" fill="white"/>
-    <circle cx="10.4" cy="12.8" r="0.32000000000000006" fill="white"/>
-  </g>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="8" cy="8" r="6" fill="url(#grad)" stroke="#ffffff" stroke-width="2"/>
+  <text x="8" y="10" text-anchor="middle" fill="white" font-family="Arial" font-size="5.333333333333333" font-weight="bold">G</text>
 </svg>
