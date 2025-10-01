@@ -44,7 +44,6 @@ chrome-notion-plugin/
 │   ├── kill-server-macos.sh # macOS optimized killer
 │   └── start-server-unix.sh # Universal Unix launcher
 ├── config.json.example       # 📋 Configuration template
-├── CONFIGURACAO_API.md      # 🔑 API configuration guide
 ├── install.js               # 🔧 Automated installation script
 └── package.json             # General project configuration
 ```
@@ -246,8 +245,6 @@ npm run build              # Project build (placeholder)
 
 ### ⚡ Quick Error Solutions
 
-👉 **[COMPLETE SOLUTIONS GUIDE](SOLUCAO_ERROS.md)** 👈
-
 ### Most common problems:
 
 #### "Could not establish connection"
@@ -300,8 +297,6 @@ npm start
 3. Manually configure in config.json if necessary
 ```
 
-**📋 For detailed solutions, see:** [SOLUCAO_ERROS.md](SOLUCAO_ERROS.md)
-
 ## 📋 System Requirements
 
 - **Node.js:** 14.0.0 or higher
@@ -347,7 +342,7 @@ Contributions are welcome! Please:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
@@ -406,7 +401,6 @@ chrome-notion-plugin/
 │   ├── kill-server-macos.sh # Finalizador otimizado para macOS
 │   └── start-server-unix.sh # Iniciador universal Unix
 ├── config.json.example       # 📋 Arquivo de configuração modelo
-├── CONFIGURACAO_API.md      # 🔑 Guia de configuração da API
 ├── install.js               # 🔧 Script de instalação automatizada
 └── package.json             # Configuração geral do projeto
 ```
@@ -589,8 +583,6 @@ npm run build              # Build do projeto (placeholder)
 
 ### ⚡ Solução Rápida de Erros Comuns
 
-👉 **[GUIA COMPLETO DE SOLUÇÕES](SOLUCAO_ERROS.md)** 👈
-
 ### Problemas mais comuns:
 
 #### "Could not establish connection"
@@ -643,8 +635,6 @@ npm start
 3. Configure manualmente no config.json se necessário
 ```
 
-**📋 Para soluções detalhadas, veja:** [SOLUCAO_ERROS.md](SOLUCAO_ERROS.md)
-
 ## 📋 Requisitos do Sistema
 
 - **Node.js:** 14.0.0 ou superior
@@ -690,7 +680,7 @@ Contributions são bem-vindas! Por favor:
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Este projeto está licenciado sob a MIT License.
 
 ## 🙏 Agradecimentos
 
